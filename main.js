@@ -19,6 +19,10 @@ const printMenu = () => {
   `);
 };
 
+const randomID = () => {
+  return Math.floor(Math.random() * 1000);
+};
+
 const movies = [];
 
 fs.readFile("movies.json", "utf8", (err, data) => {
@@ -37,7 +41,7 @@ const fetchMovies = async () => {
   const data = await response.json();
   data.forEach((movie) => {
     const { title, year, genres, director } = movie;
-    const newMovie = new Movie(title, director, year, genres);
+    const newMovie = new Movie(randomID, title, director, year, genres);
     movies.push(newMovie);
   });
   return movies;
@@ -48,25 +52,85 @@ const addMovie = () => {
   const director = input("Enter movie director: ");
   const year = input("Enter movie year: ");
   const genre = input("Enter movie genre: ");
-  const newMovie = new Movie(title, director, year, genre);
+  const newMovie = new Movie(randomID(), title, director, year, genre);
   movies.push(newMovie);
   saveMoviesToJSON();
 };
 
 const updateMovie = () => {
+  const choice = input("Enter update by title or director or year or genre: ");
+  switch (choice) {
+    case "title":
+      updateMovieByTitle();
+      break;
+    case "director":
+      updateMovieByDirector();
+      break;
+    case "year":
+      updateMovieByYear();
+      break;
+    case "genre":
+      updateMovieByGenre();
+      break;
+    default:
+      break;
+  }
+};
+
+const updateMovieByTitle = () => {
   const title = input("Enter movie title: ");
+  const index = movies.findIndex((movie) => movie.title === title);
+  console.log("Movie ID:", movies[index].id);
+  if (index !== -1) {
+    const newTitle = input("Enter new movie title: ");
+    movies[index].title = newTitle;
+    saveMoviesToJSON();
+    console.log("Movie updated successfully!");
+  } else {
+    console.log("Movie not found!");
+  }
+};
+
+const updateMovieByDirector = () => {
   const director = input("Enter movie director: ");
+  const index = movies.findIndex((movie) => movie.director === director);
+  console.log("Movie ID:", movies[index].id);
+  if (index !== -1) {
+    const newDirector = input("Enter new movie director: ");
+    movies[index].director = newDirector;
+    saveMoviesToJSON();
+    console.log("Movie updated successfully!");
+  } else {
+    console.log("Movie not found!");
+  }
+};
+
+const updateMovieByYear = () => {
   const year = input("Enter movie year: ");
+  const index = movies.findIndex((movie) => movie.year === year);
+  console.log("Movie ID:", movies[index].id);
+  if (index !== -1) {
+    const newYear = input("Enter new movie year: ");
+    movies[index].year = newYear;
+    saveMoviesToJSON();
+    console.log("Movie updated successfully!");
+  } else {
+    console.log("Movie not found!");
+  }
+};
+
+const updateMovieByGenre = () => {
   const genre = input("Enter movie genre: ");
-  const newMovie = new Movie(title, director, year, genre);
-  movies.push(newMovie);
-  fs.writeFile("movies.json", JSON.stringify(movies), (err) => {
-    if (err) {
-      console.log(`Error writing file: ${err}`);
-    } else {
-      console.log(`File is written successfully!`);
-    }
-  });
+  const index = movies.findIndex((movie) => movie.genre === genre);
+  console.log("Movie ID:", movies[index].id);
+  if (index !== -1) {
+    const newGenre = input("Enter new movie genre: ");
+    movies[index].genre = newGenre;
+    saveMoviesToJSON();
+    console.log("Movie updated successfully!");
+  } else {
+    console.log("Movie not found!");
+  }
 };
 
 const deleteMovie = () => {
@@ -92,37 +156,54 @@ const deleteMovie = () => {
 const deleteMovieByTitle = () => {
   const title = input("Enter movie title: ");
   const index = movies.findIndex((movie) => movie.title === title);
+  console.log("Movie ID:", movies[index].id);
+
   if (index !== -1) {
     movies.splice(index, 1);
     saveMoviesToJSON();
+    console.log("Movie deleted successfully!");
+  } else {
+    console.log("Movie not found!");
   }
 };
 
 const deleteMovieByDirector = () => {
   const director = input("Enter movie director: ");
   const index = movies.findIndex((movie) => movie.director === director);
+  console.log("Movie ID:", movies[index].id);
   if (index !== -1) {
     movies.splice(index, 1);
     saveMoviesToJSON();
+    console.log("Movie deleted successfully!");
+  } else {
+    console.log("Movie not found!");
   }
 };
 
 const deleteMovieByYear = () => {
   const year = input("Enter movie year: ");
   const index = movies.findIndex((movie) => movie.year === year);
+  console.log("Movie ID:", movies[index].id);
 
   if (index !== -1) {
     movies.splice(index, 1);
     saveMoviesToJSON();
+    console.log("Movie deleted successfully!");
+  } else {
+    console.log("Movie not found!");
   }
 };
 
 const deleteMovieByGenre = () => {
   const genre = input("Enter movie genre: ");
   const index = movies.findIndex((movie) => movie.genre === genre);
+  console.log("Movie ID:", movies[index].id);
   if (index !== -1) {
     movies.splice(index, 1);
     saveMoviesToJSON();
+    console.log("Movie deleted successfully!");
+  } else {
+    console.log("Movie not found!");
   }
 };
 
@@ -141,7 +222,9 @@ const main = () => {
     if (err) {
       console.log(`Error reading file from disk: ${err}`);
     } else {
-      movies.push(...JSON.parse(fileData));
+      if (fileData.length > 0) {
+        movies.push(...JSON.parse(fileData));
+      }
     }
     while (true) {
       printMenu();
