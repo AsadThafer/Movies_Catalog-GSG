@@ -47,7 +47,7 @@ const fetchMovies = async () => {
     const newMovie = new Movie(randomID(), title, director, year, genre);
     movies.push(newMovie);
   });
-  saveMoviesToJSON();
+  saveMoviesToJSON(movies);
   console.log("Movies fetched successfully!");
 };
 
@@ -58,7 +58,7 @@ const addMovie = () => {
   const genre = input("Enter movie genre: ");
   const newMovie = new Movie(randomID(), title, director, year, genre);
   movies.push(newMovie);
-  fs.readFileSync("movies.json", "utf8", (err, fileData) => {
+  fs.readFile("movies.json", "utf8", (err, fileData) => {
     if (err) {
       console.log(`Error reading file from disk: ${err}`);
       return;
@@ -69,7 +69,7 @@ const addMovie = () => {
       existingMovies = JSON.parse(fileData);
     }
     existingMovies.push(newMovie);
-    saveMoviesToJSON();
+    saveMoviesToJSON(existingMovies); // Pass the updated movies array to the saveMoviesToJSON function
     console.log("Movie added successfully!");
   });
 };
@@ -101,7 +101,7 @@ const updateMovieByTitle = () => {
   if (index !== -1) {
     const newTitle = input("Enter new movie title: ");
     movies[index].title = newTitle;
-    saveMoviesToJSON();
+    saveMoviesToJSON(movies);
     console.log("Movie updated successfully!");
   } else {
     console.log("Movie not found!");
@@ -115,7 +115,7 @@ const updateMovieByDirector = () => {
   if (index !== -1) {
     const newDirector = input("Enter new movie director: ");
     movies[index].director = newDirector;
-    saveMoviesToJSON();
+    saveMoviesToJSON(movies);
     console.log("Movie updated successfully!");
   } else {
     console.log("Movie not found!");
@@ -129,7 +129,7 @@ const updateMovieByYear = () => {
   if (index !== -1) {
     const newYear = input("Enter new movie year: ");
     movies[index].year = newYear;
-    saveMoviesToJSON();
+    saveMoviesToJSON(movies);
     console.log("Movie updated successfully!");
   } else {
     console.log("Movie not found!");
@@ -143,7 +143,7 @@ const updateMovieByGenre = () => {
   if (index !== -1) {
     const newGenre = input("Enter new movie genre: ");
     movies[index].genre = newGenre;
-    saveMoviesToJSON();
+    saveMoviesToJSON(movies);
     console.log("Movie updated successfully!");
   } else {
     console.log("Movie not found!");
@@ -177,7 +177,7 @@ const deleteMovieByTitle = () => {
 
   if (index !== -1) {
     movies.splice(index, 1);
-    saveMoviesToJSON();
+    saveMoviesToJSON(movies);
     console.log("Movie deleted successfully!");
   } else {
     console.log("Movie not found!");
@@ -190,7 +190,7 @@ const deleteMovieByDirector = () => {
   console.log("Movie ID:", movies[index].id);
   if (index !== -1) {
     movies.splice(index, 1);
-    saveMoviesToJSON();
+    saveMoviesToJSON(movies);
     console.log("Movie deleted successfully!");
   } else {
     console.log("Movie not found!");
@@ -204,7 +204,7 @@ const deleteMovieByYear = () => {
 
   if (index !== -1) {
     movies.splice(index, 1);
-    saveMoviesToJSON();
+    saveMoviesToJSON(movies);
     console.log("Movie deleted successfully!");
   } else {
     console.log("Movie not found!");
@@ -217,7 +217,7 @@ const deleteMovieByGenre = () => {
   console.log("Movie ID:", movies[index].id);
   if (index !== -1) {
     movies.splice(index, 1);
-    saveMoviesToJSON();
+    saveMoviesToJSON(movies);
     console.log("Movie deleted successfully!");
   } else {
     console.log("Movie not found!");
@@ -322,7 +322,7 @@ const filterMoviesByGenre = () => {
   }
 };
 
-const saveMoviesToJSON = () => {
+const saveMoviesToJSON = (movies) => {
   try {
     fs.writeFileSync("movies.json", JSON.stringify(movies));
     console.log("File is written successfully!");
