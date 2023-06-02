@@ -10,7 +10,7 @@ const printMenu = () => {
       1) Display Movies Catalog
       2) Add new Movie (title, director, year , genre)
       3) Update a Movie (title, director, year , genre)
-      4) Delete a Movie
+      4) Delete a Movie by (title or director or year or genre)
       5) Search for a Movie by (title or director or year or genre)
       6) Filter Movies by (year or genre)
       7) Fetch Movies from API and save them to the DB
@@ -59,6 +59,7 @@ const addMovie = () => {
       console.log(`Error reading file from disk: ${err}`);
       return;
     }
+
     let existingMovies = [];
     if (fileData.length > 0) {
       existingMovies = JSON.parse(fileData);
@@ -283,26 +284,39 @@ const searchMovieByGenre = () => {
   }
 };
 
-// const sortMovie = () => {
-//     const choice = input("Enter sort by title or director or year or genre: ");
-//     switch (choice) {
-//         case "title":
-//             sortMovieByTitle();
-//             break;
-//         case "director":
-//             sortMovieByDirector();
-//             break;
-//         case "year":
-//             sortMovieByYear();
-//             break;
-//         case "genre":
-//             sortMovieByGenre();
-//             break;
-//         default:
-//             break;
-//     }
+const filterMovies = () => {
+  const choice = input("Enter filter by year or genre: ");
+  switch (choice) {
+    case "year":
+      filterMoviesByYear();
+      break;
+    case "genre":
+      filterMoviesByGenre();
+      break;
+    default:
+      break;
+  }
+};
 
-// };
+const filterMoviesByYear = () => {
+  const year = input("Enter movie year: ");
+  const filteredMovies = movies.filter((movie) => movie.year === year);
+  if (filteredMovies.length > 0) {
+    console.log(filteredMovies);
+  } else {
+    console.log("No movies found!");
+  }
+};
+
+const filterMoviesByGenre = () => {
+  const genre = input("Enter movie genre: ");
+  const filteredMovies = movies.filter((movie) => movie.genre === genre);
+  if (filteredMovies.length > 0) {
+    console.log(filteredMovies);
+  } else {
+    console.log("No movies found!");
+  }
+};
 
 const saveMoviesToJSON = () => {
   fs.writeFile("movies.json", JSON.stringify(movies), (err) => {
@@ -343,6 +357,12 @@ const main = () => {
           break;
         case "4":
           deleteMovie();
+          break;
+        case "5":
+          searchMovie();
+          break;
+        case "6":
+          filterMovies();
           break;
         case "7":
           fetchMovies();
