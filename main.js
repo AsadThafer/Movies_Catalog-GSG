@@ -54,7 +54,19 @@ const addMovie = () => {
   const genre = input("Enter movie genre: ");
   const newMovie = new Movie(randomID(), title, director, year, genre);
   movies.push(newMovie);
-  saveMoviesToJSON();
+  fs.readFile("movies.json", "utf8", (err, fileData) => {
+    if (err) {
+      console.log(`Error reading file from disk: ${err}`);
+      return;
+    }
+    let existingMovies = [];
+    if (fileData.length > 0) {
+      existingMovies = JSON.parse(fileData);
+    }
+    existingMovies.push(newMovie);
+    saveMoviesToJSON();
+    console.log("Movie added successfully!");
+  });
 };
 
 const updateMovie = () => {
@@ -207,6 +219,91 @@ const deleteMovieByGenre = () => {
   }
 };
 
+const searchMovie = () => {
+  const choice = input("Enter search by title or director or year or genre: ");
+  switch (choice) {
+    case "title":
+      searchMovieByTitle();
+      break;
+    case "director":
+      searchMovieByDirector();
+      break;
+    case "year":
+      searchMovieByYear();
+      break;
+    case "genre":
+      searchMovieByGenre();
+      break;
+    default:
+      break;
+  }
+};
+
+const searchMovieByTitle = () => {
+  const title = input("Enter movie title: ");
+  const index = movies.findIndex((movie) => movie.title === title);
+  console.log("Movie ID:", movies[index].id);
+  if (index !== -1) {
+    console.log(movies[index]);
+  } else {
+    console.log("Movie not found!");
+  }
+};
+
+const searchMovieByDirector = () => {
+  const director = input("Enter movie director: ");
+  const index = movies.findIndex((movie) => movie.director === director);
+  console.log("Movie ID:", movies[index].id);
+  if (index !== -1) {
+    console.log(movies[index]);
+  } else {
+    console.log("Movie not found!");
+  }
+};
+
+const searchMovieByYear = () => {
+  const year = input("Enter movie year: ");
+  const index = movies.findIndex((movie) => movie.year === year);
+  console.log("Movie ID:", movies[index].id);
+  if (index !== -1) {
+    console.log(movies[index]);
+  } else {
+    console.log("Movie not found!");
+  }
+};
+
+const searchMovieByGenre = () => {
+  const genre = input("Enter movie genre: ");
+  const index = movies.findIndex((movie) => movie.genre === genre);
+  console.log("Movie ID:", movies[index].id);
+  if (index !== -1) {
+    console.log(movies[index]);
+  } else {
+    console.log("Movie not found!");
+  }
+};
+
+// const sortMovie = () => {
+//     const choice = input("Enter sort by title or director or year or genre: ");
+//     switch (choice) {
+//         case "title":
+//             sortMovieByTitle();
+//             break;
+//         case "director":
+//             sortMovieByDirector();
+//             break;
+//         case "year":
+//             sortMovieByYear();
+//             break;
+//         case "genre":
+//             sortMovieByGenre();
+//             break;
+//         default:
+//             break;
+//     }
+
+// };
+
 const saveMoviesToJSON = () => {
   fs.writeFile("movies.json", JSON.stringify(movies), (err) => {
     if (err) {
@@ -222,8 +319,13 @@ const main = () => {
     if (err) {
       console.log(`Error reading file from disk: ${err}`);
     } else {
-      if (fileData.length > 0) {
-        movies.push(...JSON.parse(fileData));
+      try {
+        const parsedData = JSON.parse(fileData);
+        if (Array.isArray(parsedData)) {
+          movies.push(...parsedData);
+        }
+      } catch (parseError) {
+        console.log(`Error parsing JSON: ${parseError}`);
       }
     }
     while (true) {
