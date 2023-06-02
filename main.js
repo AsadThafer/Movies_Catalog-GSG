@@ -36,15 +36,19 @@ fs.readFile("movies.json", "utf8", (err, data) => {
 
 const fetchMovies = async () => {
   const response = await fetch(
-    "https://raw.githubusercontent.com/prust/wikipedia-movie-data/master/movies.json"
+    "https://my-json-server.typicode.com/horizon-code-academy/fake-movies-api/movies"
   );
   const data = await response.json();
   data.forEach((movie) => {
-    const { title, year, genres, director } = movie;
-    const newMovie = new Movie(randomID, title, director, year, genres);
+    const title = movie.Title; // Use Title as title
+    const year = movie.Year; // Use Year as year
+    const director = movie.Runtime; // Use runtime as director
+    const genre = "Action"; // Use "Action" as default genre for all movies
+    const newMovie = new Movie(randomID(), title, director, year, genre);
     movies.push(newMovie);
   });
-  return movies;
+  saveMoviesToJSON();
+  console.log("Movies fetched successfully!");
 };
 
 const addMovie = () => {
@@ -54,7 +58,7 @@ const addMovie = () => {
   const genre = input("Enter movie genre: ");
   const newMovie = new Movie(randomID(), title, director, year, genre);
   movies.push(newMovie);
-  fs.readFile("movies.json", "utf8", (err, fileData) => {
+  fs.readFileSync("movies.json", "utf8", (err, fileData) => {
     if (err) {
       console.log(`Error reading file from disk: ${err}`);
       return;
@@ -319,13 +323,12 @@ const filterMoviesByGenre = () => {
 };
 
 const saveMoviesToJSON = () => {
-  fs.writeFile("movies.json", JSON.stringify(movies), (err) => {
-    if (err) {
-      console.log(`Error writing file: ${err}`);
-    } else {
-      console.log(`File is written successfully!`);
-    }
-  });
+  try {
+    fs.writeFileSync("movies.json", JSON.stringify(movies));
+    console.log("File is written successfully!");
+  } catch (err) {
+    console.log(`Error writing file: ${err}`);
+  }
 };
 
 const main = () => {
